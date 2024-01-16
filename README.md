@@ -23,3 +23,10 @@ o Photos of donors stored CDN: Azure CDN (Blob storage)
 o For sending email: Google Gmail Account  
 
 o For scheduling services: Azure Functions
+
+# Data Models
+
+
+
+
+
