@@ -1,0 +1,330 @@
+﻿    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Donor CRUD Operations</title>
+    </head>
+    <body>
+
+        <h2>Login</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="username" />
+        <label for="password">Password:</label>
+        <input type="password" id="password" />
+        <button onclick="login()">Login</button>
+
+        <hr>
+        <div id="donorCrudOptions" style="display: none;">
+            <h2>Donor CRUD Operations</h2>
+
+            <!-- Get All Donors -->
+            <h3>Get All Donors</h3>
+            <button onclick="getAllDonors()">Get All Donors</button>
+            <div id="allDonors"></div>
+
+            <!-- Get Donor by ID -->
+            <h3>Get Donor by ID</h3>
+            <label for="donorId">Donor ID:</label>
+            <input type="number" id="donorId" />
+            <button onclick="getDonorById()">Get Donor by ID</button>
+            <div id="donorById"></div>
+
+            <!-- Insert Donor -->
+            <h3>Insert Donor</h3>
+            <img src="https://19070006002cdn.blob.core.windows.net/container/icon.jpg" alt="Icon" width="100" height="100">
+            <br>
+            <label for="fullName">Full Name:</label>
+            <input type="text" id="fullName" />
+            <br>
+
+            <label for="bloodType">Blood Type:</label>
+            <select id="bloodType">
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+            <br>
+
+
+
+            <label for="city">City:</label>
+            <select id="city" onchange="populateTowns()">
+                <option value="Istanbul">Istanbul</option>
+                <option value="Ankara">Ankara</option>
+                <option value="Izmir">Izmir</option>
+                <!-- Add more cities as needed -->
+            </select>
+            <br>
+
+            <label for="town">Town:</label>
+            <select id="town">
+                <!-- Populate towns dynamically based on the selected city -->
+            </select>
+            <br>
+
+            <label for="phoneNo">Phone No:</label>
+            <input type="text" id="phoneNo" />
+            <br>
+
+            <label for="branchId">Branch ID:</label>
+            <input type="text" id="branchId" />
+            <br>
+
+            <button onclick="insertDonor()">Insert Donor</button>
+
+            <!-- Update Donor -->
+            <h3>Update Donor</h3>
+            <label for="updateDonorId">Donor ID to Update:</label>
+            <input type="number" id="updateDonorId" />
+            <label for="updateFullName">Updated Full Name:</label>
+            <input type="text" id="updateFullName" />
+            <button onclick="updateDonor()">Update Donor</button>
+
+            <!-- Delete Donor -->
+            <h3>Delete Donor</h3>
+            <label for="deleteDonorId">Donor ID to Delete:</label>
+            <input type="number" id="deleteDonorId" />
+            <button onclick="deleteDonor()">Delete Donor</button>
+            <br>
+            <button onclick="navigateToAddPage()">Go to Add Page</button>
+            <br>
+            <button onclick="navigateToRequestPage()">Go to Request Page</button>
+        </div>
+            <script>
+                // Function to retrieve cached town options from localStorage
+                function getCachedTowns(city) {
+                    const cachedTowns = localStorage.getItem(city);
+                    return cachedTowns ? JSON.parse(cachedTowns) : [];
+                }
+
+                // Function to cache town options in localStorage
+                function cacheTowns(city, towns) {
+                    localStorage.setItem(city, JSON.stringify(towns));
+                }
+
+                // Function to populate towns dropdown based on the selected city
+                function populateTowns() {
+                    const selectedCity = document.getElementById("city").value;
+                    const townDropdown = document.getElementById("town");
+
+                    // Check if towns are cached
+                    let cachedTowns = getCachedTowns(selectedCity);
+
+                    if (cachedTowns.length === 0) {
+                        // If not cached, populate and cache towns
+                        cachedTowns = populateAndCacheTowns(selectedCity);
+                    }
+
+                    // Clear existing options
+                    townDropdown.innerHTML = "";
+
+                    // Add town options based on the selected city
+                    cachedTowns.forEach(town => {
+                        addOption(townDropdown, town, town);
+                    });
+                }
+
+                // Function to populate and cache towns for the selected city
+                function populateAndCacheTowns(city) {
+                    let towns = [];
+
+                    // Add logic to fetch towns for the selected city from the server
+                    // For demonstration purposes, using a hardcoded list
+                    switch (city) {
+                        case "Istanbul":
+                            towns = ["Besiktas", "Kadikoy"];
+                            break;
+                        case "Ankara":
+                            towns = ["Cankaya", "Kizilay"];
+                            break;
+                        case "Izmir":
+                            towns = ["Bornova", "Karsiyaka"];
+                            break;
+                        // Add more cases for other cities
+                    }
+
+                    // Cache towns for the selected city
+                    cacheTowns(city, towns);
+
+                    return towns;
+                }
+
+                function addOption(select, value, text) {
+                    const option = document.createElement("option");
+                    option.value = value;
+                    option.text = text;
+                    select.add(option);
+                }
+                let authToken = null;
+
+                async function makeAuthenticatedRequest(method, url, data = null) {
+                    try {
+                        console.log('Current authToken:', authToken);
+
+                        const headers = new Headers();
+                        headers.append('Content-Type', 'application/json');
+                        headers.append('Authorization', `Bearer ${authToken}`);
+
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: headers,
+                            body: data ? JSON.stringify(data) : null
+                        });
+
+                        // Check if the response content type is JSON
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            const jsonResponse = await response.json();
+                            console.log('Response Status:', response.status);
+                            console.log('Response Headers:', response.headers);
+                            console.log('Response:', jsonResponse);
+
+                            if (!response.ok) {
+                                throw new Error(jsonResponse.message || 'Request failed');
+                            }
+
+                            return jsonResponse;
+                        } else {
+                            // Handle non-JSON response (e.g., JWT token)
+                            console.log('Response Status:', response.status);
+                            console.log('Response Headers:', response.headers);
+
+                            const token = await response.text();
+                            console.log('JWT Token:', token);
+
+                            // Perform actions with the JWT token as needed
+
+                            authToken = token;
+                            return token;
+                        }
+                    } catch (error) {
+                        console.error('Error making request:', error);
+                        return null;
+                    }
+                }
+  
+                
+
+                let loginResponse = null; // Variable to store the response body
+
+                async function login() {
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+
+                    const loginData = {
+                        username: username,
+                        password: password
+                    };
+
+                    const response = await makeAuthenticatedRequest('POST', 'https://19070006002donor.azurewebsites.net/Login/Login', loginData);
+
+                    if (response) {
+                        authToken = response;
+                        localStorage.setItem('authToken', authToken);
+
+
+                        // Store the response body in the loginResponse variable
+                        loginResponse = response;
+
+                        // Show the donor CRUD options
+                        document.getElementById('donorCrudOptions').style.display = 'block';
+
+                        // Decode the JWT token to extract user information
+                        const decodedToken = parseJwt(authToken);
+                        console.log('Decoded Token:', decodedToken);
+
+                        // Perform additional actions or display user information as needed
+
+                        const allDonors = await makeAuthenticatedRequest('GET', 'https://19070006002donor.azurewebsites.net/Donor', null);
+                        document.getElementById('allDonors').innerText = JSON.stringify(allDonors, null, 2);
+                    } else {
+                        console.error('Login failed:', response);
+                    }
+                }
+
+                // Function to parse JWT token and extract claims
+                function parseJwt(token) {
+                    const base64Url = token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+
+                    return JSON.parse(jsonPayload);
+                }
+
+                function navigateToAddPage() {
+                    // Redirect to the specified URL
+                    window.location.href = 'https://19070006002donor.azurewebsites.net/add.html';
+                }
+                function navigateToRequestPage() {
+                    // Redirect to the specified URL
+                    window.location.href = 'https://19070006002donor.azurewebsites.net/request.html';
+                }
+
+                async function getAllDonors() {
+                    const token = authToken;
+
+                    const allDonors = await makeAuthenticatedRequest('GET', 'https://19070006002donor.azurewebsites.net/Donor', null, token);
+                    document.getElementById('allDonors').innerText = JSON.stringify(allDonors, null, 2);
+                }
+
+                async function getDonorById() {
+                    const token = authToken; // Replace with the actual token
+                    const donorId = document.getElementById('donorId').value;
+                    const donor = await makeAuthenticatedRequest('GET', `/Donor/${donorId}`, null, token);
+                    document.getElementById('donorById').innerText = JSON.stringify(donor, null, 2);
+                }
+
+                async function insertDonor() {
+                    const token = '<replace-with-your-auth-token>'; // Replace with the actual token
+                    const donorData = {
+                        FullName: document.getElementById('fullName').value,
+                        BloodType: document.getElementById('bloodType').value,
+                        Town: document.getElementById('town').value,
+                        City: document.getElementById('city').value,
+                        PhoneNo: document.getElementById('phoneNo').value,
+                        BranchId: parseInt(document.getElementById('branchId').value),
+                        PhotoUrl: "https://19070006002cdn.blob.core.windows.net/container/icon.jpg"
+                    };
+
+                    const response = await makeAuthenticatedRequest('POST', '/Donor', donorData, token);
+                    alert('Donor inserted successfully!');
+                }
+
+                async function updateDonor() {
+                    const token = '<replace-with-your-auth-token>'; // Replace with the actual token
+                    const updateDonorId = document.getElementById('updateDonorId').value;
+                    const updatedFullName = document.getElementById('updateFullName').value;
+
+                    const donorData = {
+                        Id: parseInt(updateDonorId),
+                        FullName: updatedFullName
+                    };
+
+                    const response = await makeAuthenticatedRequest('PUT', '/Donor', donorData, token);
+                    alert('Donor updated successfully!');
+                }
+
+                async function deleteDonor() {
+                    const token = '<replace-with-your-auth-token>'; // Replace with the actual token
+                    const deleteDonorId = document.getElementById('deleteDonorId').value;
+
+                    const donorData = {
+                        Id: parseInt(deleteDonorId)
+                    };
+
+                    const response = await makeAuthenticatedRequest('DELETE', '/Donor', donorData, token);
+                    alert('Donor deleted successfully!');
+                }
+            </script>
+
+    </body>
+    </html>

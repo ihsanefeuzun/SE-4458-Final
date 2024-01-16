@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor Information</title>
+</head>
+<body>
+    <h3>Donor Information</h3>
+
+    <label for="donorName">Select Donor:</label>
+    <select id="donorName" onchange="fillDonorInfo()">
+        <!-- Populate donor names here dynamically -->
+    </select>
+
+    <br>
+
+    <label for="bloodType">Blood Type:</label>
+    <input type="text" id="bloodType" readonly />
+
+    <br>
+
+    <label for="donationDate">Donation Date:</label>
+    <input type="text" id="donationDate" readonly />
+
+    <br>
+
+    <label for="units">Units:</label>
+    <input type="number" id="units" />
+
+    <br>
+
+    <button onclick="addBlood()">Add Blood</button>
+
+    <script>
+        // Function to retrieve the token from localStorage
+        function getAuthToken() {
+            return localStorage.getItem('authToken');
+        }
+        async function fillDonorInfo() {
+            const donorNameSelect = document.getElementById("donorName");
+            const selectedDonorName = donorNameSelect.options[donorNameSelect.selectedIndex].text;
+
+            try {
+                // Make an API call to retrieve all donors
+                const response = await fetch('https://19070006002donor.azurewebsites.net/Donor');
+                const donors = await response.json();
+
+                // Find the donor in the list
+                const donor = donors.find(d => d.fullName === selectedDonorName);
+
+                if (donor) {
+                    // Populate fields with donor information
+                    document.getElementById("bloodType").value = donor.bloodType;
+
+                    // Set the current date for donation date
+                    const currentDate = new Date();
+                    const formattedDate = currentDate.toISOString().split('T')[0];
+                    document.getElementById("donationDate").value = formattedDate;
+                } else {
+                    // Clear fields if donor not found
+                    document.getElementById("bloodType").value = "";
+                    document.getElementById("donationDate").value = "";
+                    alert("Donor not found");
+                }
+            } catch (error) {
+                // Handle errors, e.g., API call failed
+                console.error(error);
+                document.getElementById("bloodType").value = "";
+                document.getElementById("donationDate").value = "";
+                alert("An error occurred");
+            }
+        }
+
+        // Function to populate donor names in the dropdown
+        async function populateDonorNames() {
+            try {
+                // Make an API call to retrieve all donors
+                const response = await fetch('https://19070006002donor.azurewebsites.net/Donor');
+                const donors = await response.json();
+
+                // Populate donor names in the dropdown
+                const donorNameSelect = document.getElementById("donorName");
+                donors.forEach(donor => {
+                    const option = document.createElement("option");
+                    option.value = donor.fullName;
+                    option.text = donor.fullName;
+                    donorNameSelect.add(option);
+                });
+            } catch (error) {
+                // Handle errors, e.g., API call failed
+                console.error(error);
+                alert("An error occurred while fetching donor names");
+            }
+        }
+
+        // Function to send a request to add blood
+        async function addBlood() {
+            const donorName = document.getElementById("donorName").value;
+            const units = document.getElementById("units").value;
+
+            try {
+                // Make an API call to add blood
+                const response = await fetch('https://19070006002donor.azurewebsites.net/Donation/addBlood', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        donorName: donorName,
+                        units: units
+                    })
+                });
+
+                if (response.ok) {
+                    alert("Blood added successfully!");
+                } else {
+                    alert("Failed to add blood");
+                }
+            } catch (error) {
+                // Handle errors, e.g., API call failed
+                console.error(error);
+                alert("An error occurred while adding blood");
+            }
+        }
+
+        // Call function to populate donor names on page load
+        populateDonorNames();
+    </script>
+</body>
+</html>

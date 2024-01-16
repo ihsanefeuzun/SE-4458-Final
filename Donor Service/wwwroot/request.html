@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Donations</title>
+</head>
+<body>
+    <h3>Blood Donations</h3>
+
+    <div id="bloodDonations"></div>
+
+    <h3>Request Blood</h3>
+
+    <label for="donorName">Donor Name:</label>
+    <input type="text" id="donorName" />
+
+    <br>
+
+    <label for="units">Units:</label>
+    <input type="number" id="units" />
+
+    <br>
+
+    <button onclick="requestBlood()">Request Blood</button>
+
+    <script>
+        async function getBloodDonations() {
+            try {
+                const response = await fetch('https://19070006002donor.azurewebsites.net/Donation/getBloodDonations');
+                const bloodDonations = await response.json();
+
+                // Display blood donations in the 'bloodDonations' div
+                const bloodDonationsDiv = document.getElementById('bloodDonations');
+                bloodDonationsDiv.innerText = JSON.stringify(bloodDonations, null, 2);
+            } catch (error) {
+                console.error(error);
+                alert("An error occurred while fetching blood donations");
+            }
+        }
+
+        async function requestBlood() {
+            const donorName = document.getElementById('donorName').value;
+            const units = document.getElementById('units').value;
+
+            try {
+                const response = await fetch('https://19070006002donor.azurewebsites.net/Donation/requestBlood', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        donorName: donorName,
+                        units: units
+                    })
+                });
+
+                if (response.ok) {
+                    alert("Blood requested successfully!");
+                } else {
+                    alert("Failed to request blood");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("An error occurred while requesting blood");
+            }
+        }
+
+        // Call function to fetch blood donations on page load
+        getBloodDonations();
+    </script>
+</body>
+</html>
