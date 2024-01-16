@@ -11,9 +11,15 @@ I used caching in donor page.
 
 # Used services for deployment
 o data model:Azure SQL Server
+
 o For API and UI layer hosting of app services: Azure App Services 
+
 o For API gateway: Azure API management 
+
 o For queue service: Azure Message Queues
+
 o Photos of donors stored CDN: Azure CDN (Blob storage)
+
 o For sending email: Google Gmail Account  
+
 o For scheduling services: Azure Functions
