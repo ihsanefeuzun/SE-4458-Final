@@ -25,7 +25,8 @@ o For sending email: Google Gmail Account
 o For scheduling services: Azure Functions
 
 # Data Models
-[![Alt text](relative%20path/to/diagram.png?raw=true "Diagram")](https://github.com/ihsanefeuzun/SE-4458-Final/blob/main/diagram.png?raw=true)https://github.com/ihsanefeuzun/SE-4458-Final/blob/main/diagram.png?raw=true
+![Resim2](https://github.com/ihsanefeuzun/SE-4458-Final/blob/main/diagram.png?raw=true)
+
 
 
 
