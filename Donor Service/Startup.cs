@@ -76,8 +76,7 @@ namespace WebApplication1
             // add services here
             services.AddScoped<IDonorService, DonorService>();
             services.AddScoped<IDonationService, DonationService>();
-            //services.AddScoped<IBloodSearchService, BloodSearchService>();
-            // services.AddScoped<IBranchService, BranchService>();
+            
 
         }
 
