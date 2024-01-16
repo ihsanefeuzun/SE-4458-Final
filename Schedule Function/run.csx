@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 
 public static async Task Run(TimerInfo myTimer, ILogger log)
 {
-    var donorName = "string"; // Replace with the actual donor name
-    var units = 0; // Replace with the actual units
+    var donorName = "string"; 
+    var units = 0; 
 
     var requestBody = new
     {
