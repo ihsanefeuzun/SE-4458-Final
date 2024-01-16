@@ -8,6 +8,8 @@ For Donor services Swagger Document: https://19070006002donor.azurewebsites.net/
 # Video presentation
 Video Link: https://drive.google.com/file/d/18esv7MNylG2LKnIiUbIbVp9HtoVMau0U/view?usp=drive_link
 
+You can make higher the video's resolution if you cannot see clearly.
+
 # Assumptions
 Every donor has same photo and that photo stored in https://19070006002cdn.blob.core.windows.net/container/icon.jpg
 
