@@ -4,7 +4,7 @@ For Donor services: https://19070006002donor.azurewebsites.net/
 For Find Blood Service: https://19070006002finalbloodsearch.azurewebsites.net/Swagger/index.html
 
 # Video presentation
-Video Link:
+Video Link: https://drive.google.com/file/d/18esv7MNylG2LKnIiUbIbVp9HtoVMau0U/view?usp=drive_link
 
 # Assumptions
 Every donor has same photo and that photo stored in https://19070006002cdn.blob.core.windows.net/container/icon.jpg
