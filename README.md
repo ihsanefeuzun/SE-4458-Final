@@ -3,6 +3,8 @@ For Donor services: https://19070006002donor.azurewebsites.net/
 
 For Find Blood Service: https://19070006002finalbloodsearch.azurewebsites.net/Swagger/index.html
 
+For Donor services Swagger Document: https://19070006002donor.azurewebsites.net/Swagger/index.html
+
 # Video presentation
 Video Link: https://drive.google.com/file/d/18esv7MNylG2LKnIiUbIbVp9HtoVMau0U/view?usp=drive_link
 
